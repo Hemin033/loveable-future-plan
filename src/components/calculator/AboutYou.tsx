@@ -1,5 +1,6 @@
 
 import { CalculatorData } from "./types";
+import ExplanationCard from "./ExplanationCard";
 
 interface AboutYouProps {
   data: CalculatorData;
@@ -37,7 +38,12 @@ const AboutYou = ({ data, updateData }: AboutYouProps) => {
               onChange={(e) => updateData({ currentAge: parseInt(e.target.value) || 18 })}
               min="18"
               max="80"
-              className="w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded text-lg focus:outline-none focus:border-gray-400"
+              className="w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-gray-400"
+            />
+            <ExplanationCard
+              title="Current Age"
+              explanation="This is how old you are right now. Your current age helps us calculate how many years you have to save before retirement."
+              thingsToConsider="Most Canadians begin focused retirement planning between ages 30-40, but it's never too early or too late to start!"
             />
           </div>
 
@@ -51,7 +57,12 @@ const AboutYou = ({ data, updateData }: AboutYouProps) => {
               onChange={(e) => updateData({ retirementAge: Math.max(data.currentAge + 1, parseInt(e.target.value) || 65) })}
               min={data.currentAge + 1}
               max="80"
-              className="w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded text-lg focus:outline-none focus:border-gray-400"
+              className="w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-gray-400"
+            />
+            <ExplanationCard
+              title="Planned Retirement Age"
+              explanation="This is the age when you plan to stop working full-time and begin living off your retirement savings and other income sources."
+              thingsToConsider="The standard retirement age in Canada is 65, which is when you can receive full CPP benefits. However, many Canadians retire between 60-70. Retiring earlier means you need more savings, while delaying retirement can significantly increase your financial security. Working just 2-3 years longer can increase your retirement security by 25% or more."
             />
           </div>
         </div>
@@ -72,6 +83,11 @@ const AboutYou = ({ data, updateData }: AboutYouProps) => {
               </option>
             ))}
           </select>
+          <ExplanationCard
+            title="Province/Territory"
+            explanation="Your location in Canada affects tax rates, healthcare coverage, and certain retirement benefits."
+            thingsToConsider="Retirement costs can vary significantly by province. Quebec has its own pension plan (QPP) instead of CPP. Some provinces like Ontario have higher living costs but may offer better healthcare services for seniors."
+          />
         </div>
 
         {/* Marital Status */}
@@ -90,6 +106,11 @@ const AboutYou = ({ data, updateData }: AboutYouProps) => {
               </option>
             ))}
           </select>
+          <ExplanationCard
+            title="Marital Status"
+            explanation="Your relationship status affects retirement planning through potential income splitting, shared expenses, and survivor benefits."
+            thingsToConsider="Couples can often reduce taxes through income splitting strategies. Single retirees typically need 70-80% of a couple's income to maintain a similar lifestyle due to shared housing and other costs."
+          />
         </div>
 
         {/* Summary */}

@@ -1,4 +1,6 @@
+
 import { CalculatorData } from "./types";
+import ExplanationCard from "./ExplanationCard";
 
 interface CurrentSavingsProps {
   data: CalculatorData;
@@ -43,6 +45,11 @@ const CurrentSavings = ({ data, updateData }: CurrentSavingsProps) => {
             />
           </div>
           <p className="text-sm text-gray-500 mt-1">Registered Retirement Savings Plan</p>
+          <ExplanationCard
+            title="RRSP Balance"
+            explanation="A Registered Retirement Savings Plan (RRSP) is a tax-advantaged account specifically designed for retirement savings. Contributions are tax-deductible, and investments grow tax-free until withdrawal."
+            thingsToConsider="The average Canadian approaching retirement (age 55+) has approximately $125,000 in RRSP savings. Financial experts often recommend having 1x your annual salary saved by age 30, 3x by 40, 6x by 50, and 8x by 60."
+          />
         </div>
 
         {/* TFSA Balance */}
@@ -63,6 +70,11 @@ const CurrentSavings = ({ data, updateData }: CurrentSavingsProps) => {
             />
           </div>
           <p className="text-sm text-gray-500 mt-1">Tax-Free Savings Account</p>
+          <ExplanationCard
+            title="TFSA Balance"
+            explanation="A Tax-Free Savings Account (TFSA) allows your investments to grow tax-free, and you pay no taxes when you withdraw the money, making it an excellent complement to RRSPs for retirement."
+            thingsToConsider="TFSAs are particularly valuable in retirement for flexibility and tax-free withdrawals. Unlike RRSPs, TFSA withdrawals don't affect income-tested benefits like OAS. The 2025 annual contribution limit is $7,000, with a cumulative limit of $95,000 for someone who was 18+ in 2009."
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -83,6 +95,11 @@ const CurrentSavings = ({ data, updateData }: CurrentSavingsProps) => {
                 placeholder="0"
               />
             </div>
+            <ExplanationCard
+              title="Company Pension"
+              explanation="A company pension is a retirement plan offered by employers that provides regular income during retirement, either based on your salary and years of service (defined benefit) or investment performance (defined contribution)."
+              thingsToConsider="Only about 37% of Canadian workers have employer pension coverage, with higher rates in the public sector. If you have a defined benefit pension, it significantly reduces the amount you need to save personally."
+            />
           </div>
 
           {/* Other Savings */}
@@ -102,6 +119,11 @@ const CurrentSavings = ({ data, updateData }: CurrentSavingsProps) => {
                 placeholder="0"
               />
             </div>
+            <ExplanationCard
+              title="Non-Registered Savings"
+              explanation="These are regular savings or investment accounts without special tax advantages. While they don't offer tax deductions or tax-free growth, they provide flexibility with no withdrawal restrictions."
+              thingsToConsider="Non-registered accounts can be tax-efficient for certain investments like Canadian dividend stocks (eligible for the dividend tax credit) and investments that generate capital gains (only 50% taxable)."
+            />
           </div>
         </div>
 
@@ -123,6 +145,11 @@ const CurrentSavings = ({ data, updateData }: CurrentSavingsProps) => {
             />
           </div>
           <p className="text-sm text-gray-500 mt-1">Combined monthly contributions to all retirement accounts</p>
+          <ExplanationCard
+            title="Monthly Contributions"
+            explanation="This is how much you're regularly adding to your retirement savings each month across all your accounts."
+            thingsToConsider="Financial experts often recommend saving 10-15% of your pre-tax income for retirement. Even small increases in your monthly contributions can have a significant impact over time thanks to compound growth. A balanced approach using both RRSPs and TFSAs is often optimal."
+          />
         </div>
 
         {/* Summary */}

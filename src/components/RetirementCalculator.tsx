@@ -64,12 +64,18 @@ const RetirementCalculator = () => {
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-medium text-gray-900 mb-4">
+          <h1 className="text-3xl font-medium text-gray-900 mb-4">
             Retirement Calculator
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Plan your financial future with our comprehensive retirement planning tool
-          </p>
+          
+          {/* Introduction Section */}
+          <div className="max-w-3xl mx-auto mb-8">
+            <div className="bg-gray-50 border border-gray-200 rounded p-6">
+              <p className="text-gray-700 leading-relaxed">
+                Welcome to your retirement planning journey! This calculator is designed to help you understand your retirement needs, even if you're just getting started with financial planning. We'll explain everything along the way in simple terms, so you can make informed decisions about your future.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Progress Bar */}
