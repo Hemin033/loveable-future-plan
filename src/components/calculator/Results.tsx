@@ -1,5 +1,4 @@
 
-import { motion } from "framer-motion";
 import { CalculatorData, RetirementResults } from "./types";
 
 interface ResultsProps {
@@ -95,137 +94,75 @@ const Results = ({ data }: ResultsProps) => {
     }).format(value);
   };
 
-  const getSustainabilityConfig = (sustainability: string) => {
+  const getSustainabilityMessage = (sustainability: string) => {
     switch (sustainability) {
       case "good":
-        return {
-          color: "green",
-          icon: "✅",
-          message: "Your retirement plan looks sustainable!",
-          bgColor: "bg-green-50",
-          textColor: "text-green-800",
-          borderColor: "border-green-200"
-        };
+        return "Your retirement plan looks sustainable";
       case "needs-improvement":
-        return {
-          color: "yellow",
-          icon: "⚠️",
-          message: "Your plan needs improvements",
-          bgColor: "bg-yellow-50",
-          textColor: "text-yellow-800",
-          borderColor: "border-yellow-200"
-        };
+        return "Your plan needs improvements";
       default:
-        return {
-          color: "red",
-          icon: "❌",
-          message: "Current plan insufficient",
-          bgColor: "bg-red-50",
-          textColor: "text-red-800",
-          borderColor: "border-red-200"
-        };
+        return "Current plan insufficient";
     }
   };
 
-  const sustainabilityConfig = getSustainabilityConfig(results.sustainability);
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
-    >
+    <div className="space-y-8">
       <div>
-        <h2 className="text-3xl font-light text-gray-900 mb-2">Your Retirement Plan</h2>
+        <h2 className="text-2xl font-medium text-gray-900 mb-2">Your Retirement Plan</h2>
         <p className="text-gray-600">Here's how your retirement savings plan looks</p>
       </div>
 
-      {/* Sustainability Banner */}
-      <motion.div
-        initial={{ scale: 0.95 }}
-        animate={{ scale: 1 }}
-        className={`${sustainabilityConfig.bgColor} ${sustainabilityConfig.borderColor} border-2 rounded-xl p-6 text-center`}
-      >
-        <div className="text-4xl mb-2">{sustainabilityConfig.icon}</div>
-        <h3 className={`text-2xl font-semibold ${sustainabilityConfig.textColor}`}>
-          {sustainabilityConfig.message}
+      {/* Sustainability Status */}
+      <div className="bg-gray-50 p-6 rounded text-center">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          {getSustainabilityMessage(results.sustainability)}
         </h3>
-        <p className={`mt-2 ${sustainabilityConfig.textColor}`}>
+        <p className="text-gray-600">
           Your money is projected to last {results.yearsMoneyWillLast} years in retirement
         </p>
-      </motion.div>
-
-      {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white border border-gray-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
-        >
-          <h4 className="text-sm font-medium text-gray-600 mb-2">Savings at Retirement</h4>
-          <div className="text-3xl font-bold text-green-600">{formatCurrency(results.savingsAtRetirement)}</div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white border border-gray-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
-        >
-          <h4 className="text-sm font-medium text-gray-600 mb-2">Monthly Income Needed</h4>
-          <div className="text-3xl font-bold text-blue-600">{formatCurrency(results.monthlyIncomeNeeded)}</div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white border border-gray-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
-        >
-          <h4 className="text-sm font-medium text-gray-600 mb-2">Government Benefits</h4>
-          <div className="text-3xl font-bold text-purple-600">{formatCurrency(results.monthlyGovernmentBenefits)}</div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white border border-gray-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
-        >
-          <h4 className="text-sm font-medium text-gray-600 mb-2">Years Money Will Last</h4>
-          <div className="text-3xl font-bold text-orange-600">{results.yearsMoneyWillLast}</div>
-        </motion.div>
       </div>
 
-      {/* Tips Section */}
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-gray-50 p-6 rounded">
+          <h4 className="text-sm font-medium text-gray-600 mb-2">Savings at Retirement</h4>
+          <div className="text-2xl font-medium text-gray-900">{formatCurrency(results.savingsAtRetirement)}</div>
+        </div>
+
+        <div className="bg-gray-50 p-6 rounded">
+          <h4 className="text-sm font-medium text-gray-600 mb-2">Monthly Income Needed</h4>
+          <div className="text-2xl font-medium text-gray-900">{formatCurrency(results.monthlyIncomeNeeded)}</div>
+        </div>
+
+        <div className="bg-gray-50 p-6 rounded">
+          <h4 className="text-sm font-medium text-gray-600 mb-2">Government Benefits</h4>
+          <div className="text-2xl font-medium text-gray-900">{formatCurrency(results.monthlyGovernmentBenefits)}</div>
+        </div>
+
+        <div className="bg-gray-50 p-6 rounded">
+          <h4 className="text-sm font-medium text-gray-600 mb-2">Years Money Will Last</h4>
+          <div className="text-2xl font-medium text-gray-900">{results.yearsMoneyWillLast}</div>
+        </div>
+      </div>
+
+      {/* Recommendations */}
       {results.tips.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="bg-blue-50 border border-blue-200 rounded-xl p-6"
-        >
-          <h3 className="text-lg font-semibold text-blue-900 mb-4">Recommendations to Improve Your Plan</h3>
+        <div className="bg-gray-50 p-6 rounded">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Recommendations to Improve Your Plan</h3>
           <ul className="space-y-2">
             {results.tips.map((tip, index) => (
-              <li key={index} className="flex items-start text-blue-800">
-                <span className="text-blue-600 mr-2">•</span>
+              <li key={index} className="flex items-start text-gray-700">
+                <span className="text-gray-500 mr-2">•</span>
                 {tip}
               </li>
             ))}
           </ul>
-        </motion.div>
+        </div>
       )}
 
-      {/* Detailed Breakdown */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="bg-gray-50 rounded-xl p-6"
-      >
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Calculation Details</h3>
+      {/* Calculation Details */}
+      <div className="bg-gray-50 p-6 rounded">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Calculation Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
           <div>
             <h4 className="font-medium text-gray-700 mb-2">Current Situation</h4>
@@ -248,8 +185,8 @@ const Results = ({ data }: ResultsProps) => {
             </div>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
 
