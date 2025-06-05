@@ -1,27 +1,4 @@
 
-export interface RetirementData {
-  // Step 1: About You
-  currentAge: number;
-  retirementAge: number;
-  province: string;
-  maritalStatus: string;
-  
-  // Step 2: Current Savings
-  rrspBalance: number;
-  tfsaBalance: number;
-  otherSavings: number;
-  nonRegisteredSavings: number;
-  monthlyContributions: number;
-  expectedReturn: number;
-  
-  // Step 3: Income & Goals
-  desiredIncome: number;
-  cppBenefits: number;
-  oasBenefits: number;
-  companyPension: number;
-  additionalIncome: number;
-}
-
 export interface CalculatorData {
   // Step 1: About You
   currentAge: number;
