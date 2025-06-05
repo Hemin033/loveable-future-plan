@@ -1,6 +1,7 @@
+
 import React, { useState } from "react";
-import { SmartTooltip } from "./SmartTooltip";
-import { LifestyleSelector } from "./LifestyleSelector";
+import SmartTooltip from "./SmartTooltip";
+import LifestyleSelector from "./LifestyleSelector";
 import { formatCurrency } from "./utils";
 
 interface IncomeGoalsProps {

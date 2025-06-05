@@ -1,43 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { CanadianDollar } from "lucide-react";
+import React from "react";
 import SmartTooltip from "./SmartTooltip";
-import ReturnRateSelector from "./ReturnRateSelector";
 import CompanyPensionSelector from "./CompanyPensionSelector";
+import ReturnRateSelector from "./ReturnRateSelector";
+import { formatCurrency } from "./utils";
 
 interface CurrentSavingsProps {
   data: any;
-  updateData: (data: any) => void;
+  updateData: (updates: any) => void;
 }
 
 const CurrentSavings = ({ data, updateData }: CurrentSavingsProps) => {
-  const formatCurrency = (value: number | string, applyFormatting = false): string => {
-    const num = typeof value === 'string' ? parseFloat(value.replace(/[^0-9.-]+/g, '')) : value;
-    if (isNaN(num)) return '';
-    
-    const formatted = new Intl.NumberFormat('en-CA', {
-      style: 'decimal',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(num);
-    
-    return applyFormatting ? `$${formatted}` : formatted;
-  };
-
-  const parseCurrency = (value: string): number => {
-    const num = parseFloat(value.replace(/[^0-9.-]+/g, ''));
-    return isNaN(num) ? 0 : num;
-  };
-
   const handleCurrencyChange = (value: string, field: string) => {
-    const parsedValue = parseCurrency(value);
-    updateData({ [field]: parsedValue });
+    const numericValue = parseFloat(value.replace(/[^0-9.-]+/g, '')) || 0;
+    updateData({ [field]: numericValue });
   };
 
-  const totalSavings =
-    data.rrspBalance +
-    data.tfsaBalance +
-    data.nonRegisteredSavings +
-    data.otherSavings;
+  const totalSavings = (data.rrspBalance || 0) + (data.tfsaBalance || 0) + 
+                      (data.nonRegisteredSavings || 0) + (data.otherSavings || 0);
 
   return (
     <div className="step-container p-8">

@@ -2,6 +2,7 @@ import React from "react";
 import { DollarSign, Target, Calendar, TrendingUp, CheckCircle, ArrowRight, Zap } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 import { RetirementData } from "./types";
+import { formatCurrency, calculateCompoundGrowth } from "./utils";
 import MetricCard from "./MetricCard";
 
 interface ResultsProps {
@@ -9,41 +10,27 @@ interface ResultsProps {
 }
 
 const Results = ({ data }: ResultsProps) => {
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat("en-CA", {
-      style: "currency",
-      currency: "CAD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const totalCurrentSavings =
-    data.rrspBalance + data.tfsaBalance + data.nonRegisteredSavings + data.otherSavings;
-
-  const targetRetirementIncome =
-    data.desiredIncome *
-    (data.selectedLifestyle === "essential"
-      ? 0.6
-      : data.selectedLifestyle === "comfortable"
-      ? 0.7
-      : data.selectedLifestyle === "enhanced"
-      ? 0.8
-      : data.customPercentage / 100);
-
-  const monthlyRetirementIncome =
-    (data.cppBenefits + data.oasBenefits + data.companyPension) / 12;
-
-  const requiredSavings =
-    ((targetRetirementIncome - data.cppBenefits - data.oasBenefits - data.companyPension) * 25);
-
-  const projectedSavings =
-    totalCurrentSavings *
-    Math.pow(1 + data.expectedReturn, data.retirementAge - data.currentAge) +
-    ((Math.pow(1 + data.expectedReturn, data.retirementAge - data.currentAge) - 1) /
-      data.expectedReturn) *
-    data.monthlyContributions *
-    12;
+  // Calculate totals
+  const totalCurrentSavings = (data.rrspBalance || 0) + (data.tfsaBalance || 0) + 
+                             (data.nonRegisteredSavings || 0) + (data.otherSavings || 0);
+  
+  const yearsToRetirement = data.retirementAge - data.currentAge;
+  
+  // Calculate projected savings at retirement
+  const projectedSavings = calculateCompoundGrowth(
+    totalCurrentSavings,
+    data.monthlyContributions,
+    data.expectedReturn,
+    yearsToRetirement
+  );
+  
+  // Calculate required savings for retirement
+  const annualRetirementIncome = data.desiredIncome * 0.7; // 70% rule default
+  const governmentBenefits = (data.cppBenefits || 0) + (data.oasBenefits || 0);
+  const incomeFromSavings = annualRetirementIncome - governmentBenefits - (data.companyPension || 0);
+  const requiredSavings = Math.max(0, incomeFromSavings * 25); // 4% withdrawal rule
+  
+  const monthlyRetirementIncome = annualRetirementIncome / 12;
 
   const generateProjectionData = () => {
     const projectionData = [];
@@ -69,12 +56,6 @@ const Results = ({ data }: ResultsProps) => {
   const getReadinessScore = () => {
     const ratio = projectedSavings / requiredSavings;
     return Math.min(100, Math.round(ratio * 100));
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'var(--success)';
-    if (score >= 60) return 'var(--warning)';
-    return 'var(--error)';
   };
 
   const readinessScore = getReadinessScore();

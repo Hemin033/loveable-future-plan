@@ -20,6 +20,10 @@ export interface RetirementData {
   oasBenefits: number;
   companyPension: number;
   additionalIncome: number;
+  
+  // New fields for lifestyle selector
+  selectedLifestyle?: string;
+  customPercentage?: number;
 }
 
 export interface CalculatorData {
