@@ -1,35 +1,37 @@
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import ProgressBar from "./calculator/ProgressBar";
 import AboutYou from "./calculator/AboutYou";
 import CurrentSavings from "./calculator/CurrentSavings";
 import IncomeGoals from "./calculator/IncomeGoals";
 import Results from "./calculator/Results";
-import { CalculatorData } from "./calculator/types";
+import InfoModal from "./calculator/InfoModal";
+import { RetirementData } from "./calculator/types";
 
 const RetirementCalculator = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [data, setData] = useState<CalculatorData>({
-    currentAge: 35,
+  const [data, setData] = useState<RetirementData>({
+    currentAge: 30,
     retirementAge: 65,
-    province: "Ontario",
-    maritalStatus: "Single",
-    rrspBalance: 25000,
-    tfsaBalance: 15000,
-    pensionValue: 0,
+    province: "ON",
+    maritalStatus: "single",
+    rrspBalance: 0,
+    tfsaBalance: 0,
     otherSavings: 0,
-    monthlyContributions: 500,
-    annualIncome: 75000,
-    incomeGrowth: 3,
-    retirementIncomePercent: 70,
-    expectedCPP: 808,
-    expectedOAS: 728,
-    riskTolerance: "moderate"
+    nonRegisteredSavings: 0,
+    monthlyContributions: 0,
+    expectedReturn: 0.06,
+    desiredIncome: 60000,
+    cppBenefits: 12000,
+    oasBenefits: 8700,
+    companyPension: 0,
+    additionalIncome: 0,
   });
 
-  const updateData = (newData: Partial<CalculatorData>) => {
-    setData(prev => ({ ...prev, ...newData }));
+  const updateData = (updates: Partial<RetirementData>) => {
+    setData(prev => ({ ...prev, ...updates }));
   };
 
   const nextStep = () => {
@@ -55,77 +57,86 @@ const RetirementCalculator = () => {
       case 4:
         return <Results data={data} />;
       default:
-        return <AboutYou data={data} updateData={updateData} />;
+        return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-medium text-gray-900 mb-4">
-            Retirement Calculator
-          </h1>
-          
-          {/* Introduction Section */}
-          <div className="max-w-3xl mx-auto mb-8">
-            <div className="bg-gray-50 border border-gray-200 rounded p-6">
-              <p className="text-gray-700 leading-relaxed">
-                Welcome to your retirement planning journey! This calculator is designed to help you understand your retirement needs, even if you're just getting started with financial planning. We'll explain everything along the way in simple terms, so you can make informed decisions about your future.
-              </p>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="bg-white border-b border-border-color">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-display text-brand-secondary">
+              Retirement Planning Calculator
+            </h1>
+            <p className="text-body text-text-secondary max-w-3xl mx-auto">
+              Welcome to your retirement planning journey! This calculator is designed to help you understand your retirement needs, even if you're just getting started with financial planning. We'll explain everything along the way in simple terms, so you can make informed decisions about your future.
+            </p>
+            <div className="flex items-center justify-center space-x-6 text-caption text-text-tertiary">
+              <span>• Takes 3-5 minutes</span>
+              <span>• Your information stays private</span>
+              <span>• Get personalized recommendations</span>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Progress Bar */}
-        <ProgressBar currentStep={currentStep} />
+      {/* Progress Bar */}
+      <div className="bg-surface border-b border-border-color">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <ProgressBar currentStep={currentStep} />
+        </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="mt-12">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2 }}
-              className="bg-white border border-gray-200 rounded p-8"
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-6 py-12">
+        <div className="card-elevated">
+          {renderStep()}
+          
+          {/* Navigation */}
+          <div className="flex justify-between items-center mt-12 pt-6 border-t border-border-color">
+            <Button
+              variant="outline"
+              onClick={prevStep}
+              disabled={currentStep === 1}
+              className="btn-secondary"
             >
-              {renderStep()}
-              
-              {/* Navigation */}
-              <div className="flex justify-between mt-12 pt-8 border-t border-gray-200">
-                <button
-                  onClick={prevStep}
-                  disabled={currentStep === 1}
-                  className={`px-6 py-3 rounded font-medium transition-colors ${
-                    currentStep === 1
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  Previous
-                </button>
-                
-                {currentStep < 4 ? (
-                  <button
-                    onClick={nextStep}
-                    className="px-6 py-3 bg-gray-900 text-white rounded font-medium hover:bg-gray-800 transition-colors"
-                  >
-                    Next Step
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setCurrentStep(1)}
-                    className="px-6 py-3 bg-gray-900 text-white rounded font-medium hover:bg-gray-800 transition-colors"
-                  >
-                    Start Over
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          </AnimatePresence>
+              Previous
+            </Button>
+            
+            <div className="text-caption text-text-secondary">
+              Step {currentStep} of 4
+            </div>
+            
+            {currentStep < 4 ? (
+              <Button
+                onClick={nextStep}
+                className="btn-primary"
+              >
+                Next Step
+              </Button>
+            ) : (
+              <Button
+                onClick={() => window.print()}
+                className="btn-primary"
+              >
+                Save Results
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Help Section */}
+      <div className="bg-surface border-t border-border-color mt-16">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="text-center space-y-4">
+            <h3 className="text-h3 text-brand-secondary">Need Help?</h3>
+            <p className="text-body text-text-secondary">
+              This calculator provides estimates based on your inputs. For personalized financial advice, consider consulting with a qualified financial advisor.
+            </p>
+          </div>
         </div>
       </div>
     </div>

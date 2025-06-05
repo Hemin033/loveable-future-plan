@@ -1,16 +1,18 @@
-import { useState } from "react";
-import { Info } from "lucide-react";
-import { CalculatorData } from "./types";
-import InfoModal from "./InfoModal";
+
+import React from "react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { RetirementData } from "./types";
+import ExplanationCard from "./ExplanationCard";
 
 interface IncomeGoalsProps {
-  data: CalculatorData;
-  updateData: (data: Partial<CalculatorData>) => void;
+  data: RetirementData;
+  updateData: (updates: Partial<RetirementData>) => void;
 }
 
 const IncomeGoals = ({ data, updateData }: IncomeGoalsProps) => {
-  const [showCPPModal, setShowCPPModal] = useState(false);
-  const [showOASModal, setShowOASModal] = useState(false);
+  const totalExpectedIncome = data.cppBenefits + data.oasBenefits + data.companyPension + data.additionalIncome;
+  const incomeGap = Math.max(0, data.desiredIncome - totalExpectedIncome);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-CA', {
@@ -21,251 +23,189 @@ const IncomeGoals = ({ data, updateData }: IncomeGoalsProps) => {
     }).format(value);
   };
 
-  const incomeGrowthOptions = [
-    { value: 2, label: "2% - Conservative" },
-    { value: 2.5, label: "2.5% - Moderate" },
-    { value: 3, label: "3% - Above Average" },
-    { value: 3.5, label: "3.5% - Optimistic" }
-  ];
-
-  const retirementIncomeOptions = [
-    { value: 60, label: "60% - Basic lifestyle" },
-    { value: 70, label: "70% - Comfortable lifestyle" },
-    { value: 80, label: "80% - Current lifestyle" },
-    { value: 90, label: "90% - Enhanced lifestyle" }
-  ];
-
-  const riskToleranceOptions = [
-    { value: "conservative", label: "Conservative (4-5% return)" },
-    { value: "moderate", label: "Moderate (6-7% return)" },
-    { value: "aggressive", label: "Aggressive (8-9% return)" }
-  ];
-
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-medium text-gray-900 mb-2">Income & Goals</h2>
-        <p className="text-gray-600">Define your income and retirement lifestyle goals</p>
+      <div className="text-center space-y-2">
+        <h2 className="text-h1 text-brand-secondary">Income & Goals</h2>
+        <p className="text-body text-text-secondary">
+          Let's determine how much income you'll need and what sources you can expect in retirement.
+        </p>
       </div>
 
-      <div className="space-y-6">
-        {/* Annual Income */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Annual Gross Income
-          </label>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">
-              $
-            </span>
-            <input
-              type="number"
-              value={data.annualIncome}
-              onChange={(e) => updateData({ annualIncome: parseInt(e.target.value) || 0 })}
-              className="w-full pl-8 pr-3 py-3 bg-gray-50 border border-gray-200 rounded text-lg focus:outline-none focus:border-gray-400"
-              placeholder="75,000"
-            />
+      {/* Income Gap Highlight */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="card-surface text-center">
+          <div className="text-h2 text-brand-primary font-semibold">
+            {formatCurrency(data.desiredIncome)}
           </div>
-          <p className="text-sm text-gray-500 mt-1">Total annual income before taxes</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Income Growth */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Expected Annual Income Growth
-            </label>
-            <select
-              value={data.incomeGrowth}
-              onChange={(e) => updateData({ incomeGrowth: parseFloat(e.target.value) })}
-              className="w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-gray-400"
-            >
-              {incomeGrowthOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Retirement Income Percentage */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Desired Retirement Income (% of final salary)
-            </label>
-            <select
-              value={data.retirementIncomePercent}
-              onChange={(e) => updateData({ retirementIncomePercent: parseInt(e.target.value) })}
-              className="w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-gray-400"
-            >
-              {retirementIncomeOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* CPP/QPP */}
-          <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              Expected Monthly CPP/QPP
-              <button
-                onClick={() => setShowCPPModal(true)}
-                className="ml-2 text-gray-400 hover:text-gray-600"
-              >
-                <Info size={16} />
-              </button>
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                $
-              </span>
-              <input
-                type="number"
-                value={data.expectedCPP}
-                onChange={(e) => updateData({ expectedCPP: parseInt(e.target.value) || 0 })}
-                className="w-full pl-8 pr-3 py-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-gray-400"
-              />
-            </div>
-          </div>
-
-          {/* OAS */}
-          <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              Expected Monthly OAS
-              <button
-                onClick={() => setShowOASModal(true)}
-                className="ml-2 text-gray-400 hover:text-gray-600"
-              >
-                <Info size={16} />
-              </button>
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                $
-              </span>
-              <input
-                type="number"
-                value={data.expectedOAS}
-                onChange={(e) => updateData({ expectedOAS: parseInt(e.target.value) || 0 })}
-                className="w-full pl-8 pr-3 py-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-gray-400"
-              />
-            </div>
+          <div className="text-caption text-text-secondary">
+            desired annual income
           </div>
         </div>
+        <div className="card-surface text-center">
+          <div className="text-h2 text-text-secondary font-semibold">
+            {formatCurrency(totalExpectedIncome)}
+          </div>
+          <div className="text-caption text-text-secondary">
+            expected from benefits
+          </div>
+        </div>
+        <div className="card-surface text-center">
+          <div className="text-h2 text-brand-secondary font-semibold">
+            {formatCurrency(incomeGap)}
+          </div>
+          <div className="text-caption text-text-secondary">
+            needed from savings
+          </div>
+        </div>
+      </div>
 
-        {/* Risk Tolerance */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Investment Risk Tolerance
-          </label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Desired Income */}
+        <div className="space-y-4">
           <div className="space-y-2">
-            {riskToleranceOptions.map((option) => (
-              <label key={option.value} className="flex items-center">
-                <input
-                  type="radio"
-                  name="riskTolerance"
-                  value={option.value}
-                  checked={data.riskTolerance === option.value}
-                  onChange={(e) => updateData({ riskTolerance: e.target.value as any })}
-                  className="mr-3"
-                />
-                <span className="text-gray-700">{option.label}</span>
-              </label>
-            ))}
+            <Label htmlFor="desiredIncome" className="text-h3 text-brand-secondary">
+              Desired Annual Income
+            </Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary">$</span>
+              <Input
+                id="desiredIncome"
+                type="number"
+                value={data.desiredIncome || ""}
+                onChange={(e) => updateData({ desiredIncome: parseFloat(e.target.value) || 0 })}
+                className="input-currency pl-8"
+                placeholder="60000"
+              />
+            </div>
+            <p className="text-caption text-text-secondary">
+              Annual income needed in retirement (today's dollars)
+            </p>
           </div>
+          
+          <ExplanationCard
+            title="Setting Your Income Goal"
+            explanation="This is how much annual income you'd like to have during retirement, expressed in today's dollars. The calculator will adjust for inflation."
+            thingsToConsider="Most financial planners suggest aiming for 70-80% of your pre-retirement income to maintain a similar lifestyle. However, your specific needs may vary based on planned activities, health considerations, and whether your mortgage will be paid off."
+          />
         </div>
 
-        {/* Summary */}
-        <div className="bg-gray-50 p-6 rounded">
-          <h3 className="font-medium text-gray-900 mb-4">Your Retirement Income Plan</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <div className="text-xs text-gray-500 mb-1">Final Salary</div>
-              <div className="font-medium text-gray-900">
-                {formatCurrency(data.annualIncome * Math.pow(1 + data.incomeGrowth / 100, data.retirementAge - data.currentAge))}
-              </div>
+        {/* CPP Benefits */}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="cppBenefits" className="text-h3 text-brand-secondary">
+              Expected CPP/QPP Benefits
+            </Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary">$</span>
+              <Input
+                id="cppBenefits"
+                type="number"
+                value={data.cppBenefits || ""}
+                onChange={(e) => updateData({ cppBenefits: parseFloat(e.target.value) || 0 })}
+                className="input-currency pl-8"
+                placeholder="12000"
+              />
             </div>
-            <div>
-              <div className="text-xs text-gray-500 mb-1">Target Retirement Income</div>
-              <div className="font-medium text-gray-900">
-                {formatCurrency(data.annualIncome * Math.pow(1 + data.incomeGrowth / 100, data.retirementAge - data.currentAge) * data.retirementIncomePercent / 100)}
-              </div>
-            </div>
-            <div>
-              <div className="text-xs text-gray-500 mb-1">Government Benefits</div>
-              <div className="font-medium text-gray-900">
-                {formatCurrency((data.expectedCPP + data.expectedOAS) * 12)}
-              </div>
-            </div>
+            <p className="text-caption text-text-secondary">
+              Annual Canada/Quebec Pension Plan benefits
+            </p>
           </div>
+          
+          <ExplanationCard
+            title="CPP/QPP Benefits"
+            explanation="The Canada Pension Plan (or Quebec Pension Plan) provides a monthly retirement benefit based on your contributions throughout your working years."
+            thingsToConsider="The maximum monthly CPP payment in 2025 is $1,433.00 at age 65, but the average is about $900. Taking CPP early (from age 60) reduces your benefit by 0.6% per month (up to 36%), while delaying until 70 increases it by 0.7% per month (up to 42%)."
+          />
+        </div>
+
+        {/* OAS Benefits */}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="oasBenefits" className="text-h3 text-brand-secondary">
+              Expected OAS Benefits
+            </Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary">$</span>
+              <Input
+                id="oasBenefits"
+                type="number"
+                value={data.oasBenefits || ""}
+                onChange={(e) => updateData({ oasBenefits: parseFloat(e.target.value) || 0 })}
+                className="input-currency pl-8"
+                placeholder="8700"
+              />
+            </div>
+            <p className="text-caption text-text-secondary">
+              Annual Old Age Security benefits
+            </p>
+          </div>
+          
+          <ExplanationCard
+            title="OAS Benefits"
+            explanation="Old Age Security is a government pension available to most Canadians aged 65 and older, regardless of work history. It's based on how long you've lived in Canada after age 18."
+            thingsToConsider="The maximum monthly OAS payment in 2025 is $727.67 (ages 65-74) and $800.44 (ages 75+). OAS is subject to a 'clawback' if your individual net income exceeds $90,997 (2025) and is fully clawed back at around $133,141."
+          />
+        </div>
+
+        {/* Company Pension */}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="companyPension" className="text-h3 text-brand-secondary">
+              Company Pension
+            </Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary">$</span>
+              <Input
+                id="companyPension"
+                type="number"
+                value={data.companyPension || ""}
+                onChange={(e) => updateData({ companyPension: parseFloat(e.target.value) || 0 })}
+                className="input-currency pl-8"
+                placeholder="0"
+              />
+            </div>
+            <p className="text-caption text-text-secondary">
+              Annual employer pension benefits
+            </p>
+          </div>
+          
+          <ExplanationCard
+            title="Employer Pension Plans"
+            explanation="A company pension is a retirement plan offered by employers that provides regular income during retirement, either based on your salary and years of service (defined benefit) or investment performance (defined contribution)."
+            thingsToConsider="Only about 37% of Canadian workers have employer pension coverage, with higher rates in the public sector. If you have a defined benefit pension, it significantly reduces the amount you need to save personally."
+          />
+        </div>
+
+        {/* Additional Income */}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="additionalIncome" className="text-h3 text-brand-secondary">
+              Additional Income Sources
+            </Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary">$</span>
+              <Input
+                id="additionalIncome"
+                type="number"
+                value={data.additionalIncome || ""}
+                onChange={(e) => updateData({ additionalIncome: parseFloat(e.target.value) || 0 })}
+                className="input-currency pl-8"
+                placeholder="0"
+              />
+            </div>
+            <p className="text-caption text-text-secondary">
+              Rental income, part-time work, etc.
+            </p>
+          </div>
+          
+          <ExplanationCard
+            title="Other Income Sources"
+            explanation="These are other reliable sources of income you expect during retirement, such as rental properties, part-time work, or other investments."
+            thingsToConsider="Many Canadians supplement their retirement with part-time work, especially in the early retirement years. Rental income can provide inflation-protected cash flow, but remember to account for property management, maintenance, and potential vacancy periods."
+          />
         </div>
       </div>
-
-      {/* Modals */}
-      <InfoModal 
-        isOpen={showCPPModal}
-        onClose={() => setShowCPPModal(false)}
-        title="CPP/QPP Information"
-        content={
-          <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded">
-              <strong>2024 Average:</strong> $808/month ($9,698/year)<br />
-              <strong>Maximum 2025:</strong> Up to $1,364/month at age 65
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">How CPP/QPP is Calculated:</h4>
-              <ul className="list-disc pl-5 space-y-1 text-sm">
-                <li>Based on your highest-earning 39 years</li>
-                <li>5.95% contribution rate on earnings $3,500-$71,300</li>
-                <li>Enhanced CPP: Additional 4% on $71,300-$81,200</li>
-                <li>Employer contributes matching amount</li>
-                <li>QPP in Quebec has slightly higher rates (6.4%)</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">Starting Age Impact:</h4>
-              <ul className="list-disc pl-5 space-y-1 text-sm">
-                <li>Age 60: 36% reduction (0.6% per month early)</li>
-                <li>Age 65: Full amount</li>
-                <li>Age 70: 42% increase (0.7% per month delayed)</li>
-              </ul>
-            </div>
-          </div>
-        }
-      />
-
-      <InfoModal 
-        isOpen={showOASModal}
-        onClose={() => setShowOASModal(false)}
-        title="OAS Information"
-        content={
-          <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded">
-              <strong>2025 Maximum:</strong><br />
-              Ages 65-74: $728/month ($8,732/year)<br />
-              Ages 75+: $800/month ($9,600/year) - 10% boost
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">How OAS is Calculated:</h4>
-              <ul className="list-disc pl-5 space-y-1 text-sm">
-                <li>Residency-based (not work-based)</li>
-                <li>Need 40 years in Canada for full amount</li>
-                <li>Minimum 10 years for partial pension</li>
-                <li>Automatic 10% boost at age 75</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">Income Testing (Clawback):</h4>
-              <ul className="list-disc pl-5 space-y-1 text-sm">
-                <li>Starts at individual income over $90,997</li>
-                <li>Complete clawback at $148,451+ (ages 65-74)</li>
-              </ul>
-            </div>
-          </div>
-        }
-      />
     </div>
   );
 };
