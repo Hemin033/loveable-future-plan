@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -61,12 +60,12 @@ const RetirementCalculator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary/30 to-surface">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-surface">
       {/* Modern Header */}
       <div className="bg-surface border-b border-border sticky top-0 z-40 backdrop-blur-sm bg-surface/95">
         <div className="container-responsive py-6">
           <div className="text-center space-y-2">
-            <h1 className="text-display text-text-primary font-bold tracking-tight">
+            <h1 className="text-display text-brand-primary font-bold tracking-tight">
               Canadian Retirement Planner
             </h1>
             <p className="text-body text-text-secondary max-w-2xl mx-auto">
@@ -105,15 +104,14 @@ const RetirementCalculator = () => {
               {renderStep()}
               
               {/* Modern Navigation */}
-              <div className="flex justify-between items-center p-8 border-t border-border bg-secondary/30">
-                <Button
-                  variant="outline"
+              <div className="flex justify-between items-center p-8 border-t border-border bg-gray-50/30">
+                <button
                   onClick={prevStep}
                   disabled={currentStep === 1}
-                  className="btn-secondary disabled:opacity-50"
+                  className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   ← Previous
-                </Button>
+                </button>
                 
                 <div className="flex items-center gap-2">
                   <span className="text-caption text-text-secondary">
@@ -124,7 +122,7 @@ const RetirementCalculator = () => {
                       <div
                         key={step}
                         className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                          step <= currentStep ? 'bg-primary-brand' : 'bg-border'
+                          step <= currentStep ? 'bg-brand-accent' : 'bg-border'
                         }`}
                       />
                     ))}
@@ -132,19 +130,19 @@ const RetirementCalculator = () => {
                 </div>
                 
                 {currentStep < 4 ? (
-                  <Button
+                  <button
                     onClick={nextStep}
                     className="btn-primary"
                   >
                     Next Step →
-                  </Button>
+                  </button>
                 ) : (
-                  <Button
+                  <button
                     onClick={() => window.print()}
-                    className="btn-primary"
+                    className="btn-accent"
                   >
                     Save Results
-                  </Button>
+                  </button>
                 )}
               </div>
             </CardContent>

@@ -2,6 +2,7 @@ import React from "react";
 import { RetirementData } from "./types";
 import ModernInput from "./ModernInput";
 import MetricCard from "./MetricCard";
+import ReturnRateSelector from "./ReturnRateSelector";
 
 interface CurrentSavingsProps {
   data: RetirementData;
@@ -14,7 +15,7 @@ const CurrentSavings = ({ data, updateData }: CurrentSavingsProps) => {
   return (
     <div className="p-8 space-y-8">
       <div className="text-center space-y-4">
-        <h2 className="text-h1 text-text-primary">Current Savings</h2>
+        <h2 className="text-h1 text-brand-primary">Current Savings</h2>
         <p className="text-body text-text-secondary max-w-2xl mx-auto">
           Tell us about your existing retirement savings. Don't worry if you're just starting out – everyone begins somewhere.
         </p>
@@ -117,36 +118,21 @@ const CurrentSavings = ({ data, updateData }: CurrentSavingsProps) => {
           ]}
           quickTip="Increasing your monthly contributions by just $100 can add thousands to your retirement."
         />
-
-        {/* Expected Return */}
-        <div className="space-y-4">
-          <ModernInput
-            label="Expected Annual Return"
-            value={(data.expectedReturn * 100).toFixed(1)}
-            onChange={(value) => updateData({ expectedReturn: parseFloat(value) / 100 || 0 })}
-            type="number"
-            placeholder="6.0"
-            tooltip="Expected investment growth rate before fees and inflation"
-            helpTitle="Historical Canadian Returns"
-            helpItems={[
-              "Conservative (30% stocks): 4-5% annually",
-              "Balanced (60% stocks): 5-6% annually", 
-              "Growth (80% stocks): 6-7% annually"
-            ]}
-            quickTip="A diversified portfolio of Canadian and global stocks has historically returned 6-7% annually."
-          />
-          <div className="text-right">
-            <span className="text-h3 font-semibold text-primary-brand">%</span>
-          </div>
-        </div>
       </div>
 
+      {/* Expected Return Selector */}
+      <ReturnRateSelector
+        value={data.expectedReturn}
+        onChange={(value) => updateData({ expectedReturn: value })}
+        className="mt-8"
+      />
+
       {/* Portfolio Breakdown */}
-      <div className="bg-gradient-to-r from-secondary to-surface rounded-xl p-6 border border-border">
-        <h3 className="text-h3 text-text-primary mb-6">Your Retirement Portfolio</h3>
+      <div className="bg-gradient-to-r from-gray-50 to-surface rounded-xl p-6 border border-border">
+        <h3 className="text-h3 text-brand-primary mb-6">Your Retirement Portfolio</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-h2 font-bold text-primary-brand">
+            <div className="text-h2 font-bold text-brand-primary">
               ${data.rrspBalance.toLocaleString()}
             </div>
             <div className="text-caption text-text-secondary">RRSP</div>
@@ -155,7 +141,7 @@ const CurrentSavings = ({ data, updateData }: CurrentSavingsProps) => {
             </div>
           </div>
           <div className="text-center">
-            <div className="text-h2 font-bold text-accent">
+            <div className="text-h2 font-bold text-brand-accent">
               ${data.tfsaBalance.toLocaleString()}
             </div>
             <div className="text-caption text-text-secondary">TFSA</div>

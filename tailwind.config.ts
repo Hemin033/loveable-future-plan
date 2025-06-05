@@ -63,17 +63,27 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Modern Fintech Color Palette
-				'primary-brand': 'rgb(var(--primary-brand))',
-				'primary-hover': 'rgb(var(--primary-hover))',
-				'text-primary': 'rgb(var(--text-primary))',
-				'text-secondary': 'rgb(var(--text-secondary))',
-				'text-muted': 'rgb(var(--text-muted))',
-				'success': 'rgb(var(--success))',
-				'warning': 'rgb(var(--warning))',
-				'error': 'rgb(var(--error))',
-				'surface': 'rgb(var(--surface))',
-				'border-color': 'rgb(var(--border))',
+				// Brand Color System
+				'brand-primary': 'var(--brand-primary)',
+				'brand-accent': 'var(--brand-accent)',
+				'brand-light': 'var(--brand-light)',
+				'primary-dark': 'var(--primary-dark)',
+				'primary-light': 'var(--primary-light)',
+				'accent-dark': 'var(--accent-dark)',
+				'accent-light': 'var(--accent-light)',
+				'light-tint': 'var(--light-tint)',
+				'light-shade': 'var(--light-shade)',
+				// Legacy support
+				'primary-brand': 'var(--brand-primary)',
+				'primary-hover': 'var(--primary-dark)',
+				'text-primary': 'var(--text-primary)',
+				'text-secondary': 'var(--text-secondary)',
+				'text-muted': 'var(--text-muted)',
+				'success': 'var(--success)',
+				'warning': 'var(--warning)',
+				'error': 'var(--error)',
+				'surface': 'var(--surface)',
+				'border-color': 'var(--border)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -126,6 +136,16 @@ export default {
 						opacity: '1',
 						transform: 'translateY(0)'
 					}
+				},
+				'slideInUp': {
+					from: {
+						opacity: '0',
+						transform: 'translateY(30px)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
@@ -133,7 +153,8 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'tooltip-in': 'tooltip-in 0.2s ease-out',
 				'slide-in': 'slide-in 0.3s ease-out',
-				'fade-in': 'fade-in 0.3s ease-out'
+				'fade-in': 'fade-in 0.3s ease-out',
+				'slide-in-up': 'slideInUp 0.6s ease-out'
 			},
 			spacing: {
 				'2xs': '4px',
