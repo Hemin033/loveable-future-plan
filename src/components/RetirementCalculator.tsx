@@ -1,13 +1,12 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import ProgressBar from "./calculator/ProgressBar";
+import ModernProgressBar from "./calculator/ModernProgressBar";
 import AboutYou from "./calculator/AboutYou";
 import CurrentSavings from "./calculator/CurrentSavings";
 import IncomeGoals from "./calculator/IncomeGoals";
 import Results from "./calculator/Results";
-import InfoModal from "./calculator/InfoModal";
 import { RetirementData } from "./calculator/types";
 
 const RetirementCalculator = () => {
@@ -62,79 +61,109 @@ const RetirementCalculator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-white border-b border-border-color">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="text-center space-y-4">
-            <h1 className="text-display text-brand-secondary">
-              Retirement Planning Calculator
+    <div className="min-h-screen bg-gradient-to-br from-secondary/30 to-surface">
+      {/* Modern Header */}
+      <div className="bg-surface border-b border-border sticky top-0 z-40 backdrop-blur-sm bg-surface/95">
+        <div className="container-responsive py-6">
+          <div className="text-center space-y-2">
+            <h1 className="text-display text-text-primary font-bold tracking-tight">
+              Canadian Retirement Planner
             </h1>
-            <p className="text-body text-text-secondary max-w-3xl mx-auto">
-              Welcome to your retirement planning journey! This calculator is designed to help you understand your retirement needs, even if you're just getting started with financial planning. We'll explain everything along the way in simple terms, so you can make informed decisions about your future.
+            <p className="text-body text-text-secondary max-w-2xl mx-auto">
+              Get a personalized retirement strategy in just 5 minutes. We'll show you exactly how much to save and the best strategies for your situation.
             </p>
-            <div className="flex items-center justify-center space-x-6 text-caption text-text-tertiary">
-              <span>• Takes 3-5 minutes</span>
-              <span>• Your information stays private</span>
-              <span>• Get personalized recommendations</span>
+            <div className="flex items-center justify-center space-x-8 text-caption text-text-muted mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-success rounded-full"></div>
+                <span>Takes 3-5 minutes</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-success rounded-full"></div>
+                <span>Your data stays private</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-success rounded-full"></div>
+                <span>Canadian-specific advice</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-surface border-b border-border-color">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <ProgressBar currentStep={currentStep} />
+      <div className="bg-surface/50 border-b border-border/50 sticky top-[140px] z-30 backdrop-blur-sm">
+        <div className="container-responsive">
+          <ModernProgressBar currentStep={currentStep} />
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="card-elevated">
-          {renderStep()}
-          
-          {/* Navigation */}
-          <div className="flex justify-between items-center mt-12 pt-6 border-t border-border-color">
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              className="btn-secondary"
-            >
-              Previous
-            </Button>
-            
-            <div className="text-caption text-text-secondary">
-              Step {currentStep} of 4
-            </div>
-            
-            {currentStep < 4 ? (
-              <Button
-                onClick={nextStep}
-                className="btn-primary"
-              >
-                Next Step
-              </Button>
-            ) : (
-              <Button
-                onClick={() => window.print()}
-                className="btn-primary"
-              >
-                Save Results
-              </Button>
-            )}
-          </div>
+      <div className="container-responsive py-12">
+        <div className="max-w-4xl mx-auto">
+          <Card className="card-elevated animate-fade-in">
+            <CardContent className="p-0">
+              {renderStep()}
+              
+              {/* Modern Navigation */}
+              <div className="flex justify-between items-center p-8 border-t border-border bg-secondary/30">
+                <Button
+                  variant="outline"
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  className="btn-secondary disabled:opacity-50"
+                >
+                  ← Previous
+                </Button>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-caption text-text-secondary">
+                    Step {currentStep} of 4
+                  </span>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4].map((step) => (
+                      <div
+                        key={step}
+                        className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                          step <= currentStep ? 'bg-primary-brand' : 'bg-border'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                
+                {currentStep < 4 ? (
+                  <Button
+                    onClick={nextStep}
+                    className="btn-primary"
+                  >
+                    Next Step →
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => window.print()}
+                    className="btn-primary"
+                  >
+                    Save Results
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      {/* Help Section */}
-      <div className="bg-surface border-t border-border-color mt-16">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+      {/* Trust Footer */}
+      <div className="bg-surface border-t border-border mt-16">
+        <div className="container-responsive py-8">
           <div className="text-center space-y-4">
-            <h3 className="text-h3 text-brand-secondary">Need Help?</h3>
-            <p className="text-body text-text-secondary">
-              This calculator provides estimates based on your inputs. For personalized financial advice, consider consulting with a qualified financial advisor.
+            <div className="flex items-center justify-center gap-2 text-text-secondary">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+              </svg>
+              <span className="text-caption font-medium">Your information is secure and private</span>
+            </div>
+            <p className="text-caption text-text-muted max-w-2xl mx-auto">
+              This calculator provides estimates for educational purposes. For personalized advice, consider consulting with a qualified financial advisor. Calculations are based on current Canadian tax laws and benefit structures.
             </p>
           </div>
         </div>

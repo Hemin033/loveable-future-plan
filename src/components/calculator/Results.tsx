@@ -1,223 +1,254 @@
 
 import React from "react";
 import { RetirementData } from "./types";
-import ExplanationCard from "./ExplanationCard";
+import MetricCard from "./MetricCard";
 
 interface ResultsProps {
   data: RetirementData;
 }
 
 const Results = ({ data }: ResultsProps) => {
-  // Calculate savings goal
-  const yearsInRetirement = 25; // Assume 25 years in retirement
+  // Enhanced calculation logic
+  const yearsInRetirement = 25;
   const totalExpectedIncome = data.cppBenefits + data.oasBenefits + data.companyPension + data.additionalIncome;
   const incomeFromSavingsNeeded = Math.max(0, data.desiredIncome - totalExpectedIncome);
-  const savingsGoal = incomeFromSavingsNeeded * yearsInRetirement / 0.04; // 4% withdrawal rule
+  const savingsGoal = incomeFromSavingsNeeded * yearsInRetirement / 0.04;
 
-  // Calculate projected savings
-  const yearsToRetirement = data.retirementAge - data.currentAge;
+  const yearsToRetirement = Math.max(1, data.retirementAge - data.currentAge);
   const currentSavings = data.rrspBalance + data.tfsaBalance + data.otherSavings + data.nonRegisteredSavings;
   const futureValueCurrentSavings = currentSavings * Math.pow(1 + data.expectedReturn, yearsToRetirement);
-  const futureValueContributions = data.monthlyContributions * 12 * 
-    ((Math.pow(1 + data.expectedReturn, yearsToRetirement) - 1) / data.expectedReturn);
+  const annualContributions = data.monthlyContributions * 12;
+  
+  const futureValueContributions = annualContributions > 0 ? 
+    annualContributions * ((Math.pow(1 + data.expectedReturn, yearsToRetirement) - 1) / data.expectedReturn) : 0;
+  
   const projectedSavings = futureValueCurrentSavings + futureValueContributions;
-
-  // Calculate shortfall and additional monthly savings needed
   const shortfall = Math.max(0, savingsGoal - projectedSavings);
-  const additionalMonthlySavings = shortfall > 0 ? 
+  
+  const additionalMonthlySavings = shortfall > 0 && yearsToRetirement > 0 ? 
     (shortfall * data.expectedReturn) / (12 * (Math.pow(1 + data.expectedReturn, yearsToRetirement) - 1)) : 0;
 
-  // Calculate readiness score
-  const readinessScore = Math.min(100, Math.round((projectedSavings / savingsGoal) * 100));
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: 'CAD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
+  const readinessScore = savingsGoal > 0 ? Math.min(100, Math.round((projectedSavings / savingsGoal) * 100)) : 100;
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600";
-    if (score >= 50) return "text-yellow-600";
-    return "text-red-600";
+    if (score >= 80) return "text-success";
+    if (score >= 60) return "text-warning";
+    return "text-error";
   };
 
   const getScoreMessage = (score: number) => {
-    if (score >= 80) return "You're on track for a comfortable retirement!";
-    if (score >= 50) return "You're making progress, but consider increasing savings.";
-    return "Additional planning needed to reach your retirement goals.";
+    if (score >= 80) return "Excellent! You're on track for a comfortable retirement.";
+    if (score >= 60) return "Good progress, but consider increasing your savings.";
+    return "Let's create a plan to get you on track for retirement.";
+  };
+
+  const getScoreBgColor = (score: number) => {
+    if (score >= 80) return "from-success/10 to-success/5";
+    if (score >= 60) return "from-warning/10 to-warning/5";
+    return "from-error/10 to-error/5";
   };
 
   return (
-    <div className="space-y-8">
-      <div className="text-center space-y-2">
-        <h2 className="text-h1 text-brand-secondary">Your Retirement Plan</h2>
-        <p className="text-body text-text-secondary">
-          Here's a personalized analysis of your retirement readiness and recommendations.
+    <div className="p-8 space-y-8">
+      <div className="text-center space-y-4">
+        <h2 className="text-h1 text-text-primary">Your Retirement Plan</h2>
+        <p className="text-body text-text-secondary max-w-2xl mx-auto">
+          Here's your personalized retirement analysis with specific recommendations to achieve your goals.
         </p>
       </div>
 
-      {/* Readiness Score */}
-      <div className="card-surface text-center space-y-4">
-        <div className="relative inline-block">
+      {/* Readiness Score Hero */}
+      <div className={`bg-gradient-to-r ${getScoreBgColor(readinessScore)} rounded-2xl p-8 text-center border-2 ${
+        readinessScore >= 80 ? 'border-success/20' : 
+        readinessScore >= 60 ? 'border-warning/20' : 'border-error/20'
+      }`}>
+        <div className="relative inline-block mb-4">
           <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="50" fill="none" stroke="rgb(229, 233, 240)" strokeWidth="8"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgb(229, 231, 235)" strokeWidth="8"/>
             <circle 
               cx="60" 
               cy="60" 
               r="50" 
               fill="none" 
-              stroke="rgb(23, 179, 228)" 
+              stroke={readinessScore >= 80 ? "rgb(16, 185, 129)" : 
+                     readinessScore >= 60 ? "rgb(245, 158, 11)" : "rgb(239, 68, 68)"}
               strokeWidth="8"
               strokeDasharray={`${readinessScore * 3.14} 314`}
               strokeLinecap="round"
+              className="transition-all duration-1000 ease-out"
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className={`text-3xl font-bold ${getScoreColor(readinessScore)}`}>
+            <span className={`text-4xl font-bold ${getScoreColor(readinessScore)}`}>
               {readinessScore}%
             </span>
           </div>
         </div>
-        <div className="space-y-2">
-          <h3 className="text-h2 text-brand-secondary">Retirement Readiness Score</h3>
-          <p className="text-body text-text-secondary">{getScoreMessage(readinessScore)}</p>
-        </div>
+        <h3 className="text-h2 text-text-primary mb-2">Retirement Readiness Score</h3>
+        <p className="text-body text-text-secondary max-w-lg mx-auto">{getScoreMessage(readinessScore)}</p>
       </div>
 
-      {/* Key Metrics */}
+      {/* Key Metrics Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="card-surface text-center">
-          <div className="text-h2 text-brand-primary font-semibold">
-            {formatCurrency(savingsGoal)}
-          </div>
-          <div className="text-caption text-text-secondary">
-            Savings Goal
-          </div>
-        </div>
-        <div className="card-surface text-center">
-          <div className="text-h2 text-text-secondary font-semibold">
-            {formatCurrency(projectedSavings)}
-          </div>
-          <div className="text-caption text-text-secondary">
-            Projected Savings
-          </div>
-        </div>
-        <div className="card-surface text-center">
-          <div className="text-h2 text-brand-secondary font-semibold">
-            {formatCurrency(shortfall)}
-          </div>
-          <div className="text-caption text-text-secondary">
-            Savings Shortfall
-          </div>
-        </div>
-        <div className="card-surface text-center">
-          <div className="text-h2 text-brand-primary font-semibold">
-            {formatCurrency(additionalMonthlySavings)}
-          </div>
-          <div className="text-caption text-text-secondary">
-            Additional Monthly Savings
-          </div>
-        </div>
+        <MetricCard
+          value={savingsGoal}
+          label="Savings Goal"
+          format="currency"
+          trend="neutral"
+        />
+        <MetricCard
+          value={projectedSavings}
+          label="Projected Savings"
+          format="currency"
+          trend={projectedSavings >= savingsGoal ? "positive" : "negative"}
+        />
+        <MetricCard
+          value={shortfall}
+          label="Savings Shortfall"
+          format="currency"
+          trend={shortfall > 0 ? "negative" : "positive"}
+        />
+        <MetricCard
+          value={additionalMonthlySavings}
+          label="Additional Monthly Savings"
+          format="currency"
+          trend="neutral"
+        />
       </div>
 
-      {/* Detailed Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-4">
-          <h3 className="text-h2 text-brand-secondary">Savings Breakdown</h3>
+        {/* Detailed Analysis */}
+        <div className="space-y-6">
+          <h3 className="text-h2 text-text-primary">Savings Analysis</h3>
           
-          <ExplanationCard
-            title="Your Savings Goal"
-            explanation={`This is the total amount you should aim to have saved by your retirement date to fund your desired retirement lifestyle, based on your inputs and our calculations.`}
-            thingsToConsider="This goal assumes average life expectancy and investment returns. Consider saving extra as a buffer against living longer than expected, market downturns, or unexpected expenses."
-          />
+          <div className="card-surface space-y-4">
+            <h4 className="text-h3 text-primary-brand">Your Savings Goal</h4>
+            <p className="text-body text-text-secondary">
+              To generate ${incomeFromSavingsNeeded.toLocaleString()} annually from your savings, you'll need approximately{" "}
+              <span className="font-semibold text-text-primary">${savingsGoal.toLocaleString()}</span> by retirement.
+            </p>
+            <div className="text-caption text-text-muted">
+              * Based on the 4% withdrawal rule and 25-year retirement period
+            </div>
+          </div>
 
-          <ExplanationCard
-            title="Projected Savings"
-            explanation={`This is how much we estimate you'll have saved by retirement if you continue with your current savings rate and investment strategy.`}
-            thingsToConsider="This projection is based on average returns over time. Actual results may vary due to market fluctuations, especially near your retirement date."
-          />
+          <div className="card-surface space-y-4">
+            <h4 className="text-h3 text-primary-brand">Your Projection</h4>
+            <p className="text-body text-text-secondary">
+              With your current savings of ${currentSavings.toLocaleString()} and monthly contributions of{" "}
+              ${data.monthlyContributions.toLocaleString()}, you're projected to have{" "}
+              <span className="font-semibold text-text-primary">${projectedSavings.toLocaleString()}</span> by retirement.
+            </p>
+            <div className="text-caption text-text-muted">
+              * Assumes {(data.expectedReturn * 100).toFixed(1)}% annual return over {yearsToRetirement} years
+            </div>
+          </div>
 
           {shortfall > 0 && (
-            <ExplanationCard
-              title="Savings Shortfall"
-              explanation={`This is the gap between your savings goal and your projected savings at retirement. It represents additional savings needed to reach your retirement income goal.`}
-              thingsToConsider="If you have a shortfall, you have several options: increase your monthly savings, adjust your retirement date, modify your retirement income expectations, or plan for a more aggressive investment strategy."
-            />
+            <div className="card-surface space-y-4 border-l-4 border-warning">
+              <h4 className="text-h3 text-warning">Action Required</h4>
+              <p className="text-body text-text-secondary">
+                To reach your goal, consider increasing your monthly savings by{" "}
+                <span className="font-semibold text-warning">${additionalMonthlySavings.toLocaleString()}</span>.
+              </p>
+              <div className="bg-warning/10 rounded-lg p-3">
+                <p className="text-caption text-warning font-medium">
+                  💡 Alternative: Consider working 2-3 years longer or adjusting your retirement income goal.
+                </p>
+              </div>
+            </div>
           )}
         </div>
 
-        <div className="space-y-4">
-          <h3 className="text-h2 text-brand-secondary">Income Sources</h3>
+        {/* Income Breakdown */}
+        <div className="space-y-6">
+          <h3 className="text-h2 text-text-primary">Retirement Income Sources</h3>
           
-          <div className="space-y-3">
-            <div className="flex justify-between items-center py-2 border-b border-border-color">
+          <div className="card-surface space-y-4">
+            <div className="flex justify-between items-center py-3 border-b border-border">
               <span className="text-body text-text-secondary">CPP/QPP Benefits</span>
-              <span className="text-body font-medium">{formatCurrency(data.cppBenefits)}</span>
+              <span className="text-body font-semibold">${(data.cppBenefits / 12).toLocaleString()}/month</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-border-color">
+            <div className="flex justify-between items-center py-3 border-b border-border">
               <span className="text-body text-text-secondary">OAS Benefits</span>
-              <span className="text-body font-medium">{formatCurrency(data.oasBenefits)}</span>
+              <span className="text-body font-semibold">${(data.oasBenefits / 12).toLocaleString()}/month</span>
             </div>
             {data.companyPension > 0 && (
-              <div className="flex justify-between items-center py-2 border-b border-border-color">
+              <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-body text-text-secondary">Company Pension</span>
-                <span className="text-body font-medium">{formatCurrency(data.companyPension)}</span>
+                <span className="text-body font-semibold">${(data.companyPension / 12).toLocaleString()}/month</span>
               </div>
             )}
             {data.additionalIncome > 0 && (
-              <div className="flex justify-between items-center py-2 border-b border-border-color">
+              <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-body text-text-secondary">Additional Income</span>
-                <span className="text-body font-medium">{formatCurrency(data.additionalIncome)}</span>
+                <span className="text-body font-semibold">${(data.additionalIncome / 12).toLocaleString()}/month</span>
               </div>
             )}
-            <div className="flex justify-between items-center py-2 border-b border-border-color">
+            <div className="flex justify-between items-center py-3 border-b border-border">
               <span className="text-body text-text-secondary">From Personal Savings</span>
-              <span className="text-body font-medium">{formatCurrency(incomeFromSavingsNeeded)}</span>
+              <span className="text-body font-semibold">${(incomeFromSavingsNeeded / 12).toLocaleString()}/month</span>
             </div>
-            <div className="flex justify-between items-center py-3 bg-surface rounded px-3">
-              <span className="text-h3 text-brand-secondary">Total Annual Income</span>
-              <span className="text-h3 font-semibold">{formatCurrency(data.desiredIncome)}</span>
+            <div className="flex justify-between items-center py-4 bg-primary-brand/5 rounded-lg px-4">
+              <span className="text-h3 text-text-primary font-semibold">Total Monthly Income</span>
+              <span className="text-h3 font-bold text-primary-brand">${(data.desiredIncome / 12).toLocaleString()}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Recommendations */}
-      <div className="card-surface space-y-4">
-        <h3 className="text-h2 text-brand-secondary">Next Steps</h3>
-        <div className="space-y-3">
-          {additionalMonthlySavings > 0 && (
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-brand-primary rounded-full mt-2 flex-shrink-0"></div>
-              <p className="text-body">
-                Consider increasing your monthly savings by <strong>{formatCurrency(additionalMonthlySavings)}</strong> to reach your retirement goal.
-              </p>
+      {/* Action Plan */}
+      <div className="card-surface space-y-6">
+        <h3 className="text-h2 text-text-primary">Your Action Plan</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h4 className="text-h3 text-primary-brand">Immediate Steps</h4>
+            <div className="space-y-3">
+              {additionalMonthlySavings > 0 && (
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-primary-brand rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-body text-text-secondary">
+                    Increase monthly savings by <strong>${additionalMonthlySavings.toLocaleString()}</strong> to reach your goal
+                  </p>
+                </div>
+              )}
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-primary-brand rounded-full mt-2 flex-shrink-0"></div>
+                <p className="text-body text-text-secondary">
+                  Maximize your RRSP and TFSA contributions first for tax advantages
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-primary-brand rounded-full mt-2 flex-shrink-0"></div>
+                <p className="text-body text-text-secondary">
+                  Set up automatic monthly contributions to stay on track
+                </p>
+              </div>
             </div>
-          )}
-          
-          <div className="flex items-start space-x-3">
-            <div className="w-2 h-2 bg-brand-primary rounded-full mt-2 flex-shrink-0"></div>
-            <p className="text-body">
-              Review and optimize your investment allocation to ensure it matches your risk tolerance and time horizon.
-            </p>
           </div>
           
-          <div className="flex items-start space-x-3">
-            <div className="w-2 h-2 bg-brand-primary rounded-full mt-2 flex-shrink-0"></div>
-            <p className="text-body">
-              Consider consulting with a financial advisor to create a comprehensive retirement plan.
-            </p>
-          </div>
-          
-          <div className="flex items-start space-x-3">
-            <div className="w-2 h-2 bg-brand-primary rounded-full mt-2 flex-shrink-0"></div>
-            <p className="text-body">
-              Review your plan annually and adjust as your income, expenses, and goals change.
-            </p>
+          <div className="space-y-4">
+            <h4 className="text-h3 text-success">Long-term Strategy</h4>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-success rounded-full mt-2 flex-shrink-0"></div>
+                <p className="text-body text-text-secondary">
+                  Review and rebalance your investment portfolio annually
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-success rounded-full mt-2 flex-shrink-0"></div>
+                <p className="text-body text-text-secondary">
+                  Consider consulting with a fee-only financial advisor
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-success rounded-full mt-2 flex-shrink-0"></div>
+                <p className="text-body text-text-secondary">
+                  Reassess your plan annually or after major life changes
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

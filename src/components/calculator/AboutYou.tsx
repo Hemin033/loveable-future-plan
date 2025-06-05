@@ -1,9 +1,9 @@
 
 import React from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { RetirementData } from "./types";
-import ExplanationCard from "./ExplanationCard";
+import ModernInput from "./ModernInput";
+import MetricCard from "./MetricCard";
+import SmartTooltip from "./SmartTooltip";
 
 interface AboutYouProps {
   data: RetirementData;
@@ -34,140 +34,150 @@ const maritalStatuses = [
 ];
 
 const AboutYou = ({ data, updateData }: AboutYouProps) => {
-  const yearsToRetirement = data.retirementAge - data.currentAge;
+  const yearsToRetirement = Math.max(0, data.retirementAge - data.currentAge);
 
   return (
-    <div className="space-y-8">
-      <div className="text-center space-y-2">
-        <h2 className="text-h1 text-brand-secondary">About You</h2>
-        <p className="text-body text-text-secondary">
-          Let's start with some basic information to personalize your retirement plan.
+    <div className="p-8 space-y-8">
+      <div className="text-center space-y-4">
+        <h2 className="text-h1 text-text-primary">About You</h2>
+        <p className="text-body text-text-secondary max-w-2xl mx-auto">
+          Let's start with some basic information to create your personalized retirement strategy.
         </p>
       </div>
 
       {/* Years to Retirement Highlight */}
-      <div className="card-surface text-center">
-        <div className="text-display text-brand-primary font-bold">
-          {yearsToRetirement}
-        </div>
-        <div className="text-body text-text-secondary">
-          years until retirement
-        </div>
+      <div className="flex justify-center">
+        <MetricCard
+          value={yearsToRetirement}
+          label="years until retirement"
+          size="large"
+          className="text-center border-2 border-primary-brand/20"
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Current Age */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="currentAge" className="text-h3 text-brand-secondary">
-              Current Age
-            </Label>
-            <Input
-              id="currentAge"
-              type="number"
-              value={data.currentAge}
-              onChange={(e) => updateData({ currentAge: parseInt(e.target.value) || 0 })}
-              className="input-field text-2xl font-semibold"
-              min="18"
-              max="75"
-            />
-            <p className="text-caption text-text-secondary">
-              This helps us calculate how many years you have to save
-            </p>
-          </div>
-          
-          <ExplanationCard
-            title="Understanding Your Timeline"
-            explanation="This is how old you are right now. Your current age helps us calculate how many years you have to save before retirement."
-            thingsToConsider="Most Canadians begin focused retirement planning between ages 30-40, but it's never too early or too late to start!"
+        <div className="space-y-6">
+          <ModernInput
+            label="Current Age"
+            value={data.currentAge}
+            onChange={(value) => updateData({ currentAge: parseInt(value) || 0 })}
+            type="number"
+            placeholder="30"
+            tooltip="Your age today - used to calculate your retirement timeline"
+            helpTitle="Why Your Age Matters"
+            helpItems={[
+              "More time means more compound growth potential",
+              "Starting at 25 vs 35 can double your retirement fund",
+              "Even starting at 50+ can significantly impact your future"
+            ]}
+            quickTip="The best time to start was 20 years ago. The second best time is now."
           />
         </div>
 
         {/* Retirement Age */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="retirementAge" className="text-h3 text-brand-secondary">
-              Planned Retirement Age
-            </Label>
-            <Input
-              id="retirementAge"
-              type="number"
-              value={data.retirementAge}
-              onChange={(e) => updateData({ retirementAge: parseInt(e.target.value) || 0 })}
-              className="input-field text-2xl font-semibold"
-              min="55"
-              max="75"
-            />
-            <p className="text-caption text-text-secondary">
-              When you plan to stop working full-time
-            </p>
-          </div>
-          
-          <ExplanationCard
-            title="Choosing Your Retirement Age"
-            explanation="This is the age when you plan to stop working full-time and begin living off your retirement savings and other income sources."
-            thingsToConsider="The standard retirement age in Canada is 65, which is when you can receive full CPP benefits. However, many Canadians retire between 60-70. Retiring earlier means you need more savings, while delaying retirement can significantly increase your financial security."
+        <div className="space-y-6">
+          <ModernInput
+            label="Planned Retirement Age"
+            value={data.retirementAge}
+            onChange={(value) => updateData({ retirementAge: parseInt(value) || 0 })}
+            type="number"
+            placeholder="65"
+            tooltip="When you plan to stop working full-time"
+            helpTitle="Choosing Your Retirement Age"
+            helpItems={[
+              "Standard retirement age in Canada is 65 (full CPP benefits)",
+              "Retiring early (60-64) reduces CPP by 0.6% per month",
+              "Delaying retirement (66-70) increases CPP by 0.7% per month"
+            ]}
+            quickTip="Every year you delay retirement can increase your financial security significantly."
           />
         </div>
 
         {/* Province */}
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="province" className="text-h3 text-brand-secondary">
+          <div className="flex items-center gap-2">
+            <label className="text-h3 text-text-primary font-medium">
               Province/Territory
-            </Label>
-            <select
-              id="province"
-              value={data.province}
-              onChange={(e) => updateData({ province: e.target.value })}
-              className="input-field"
-            >
-              {provinces.map((province) => (
-                <option key={province.value} value={province.value}>
-                  {province.label}
-                </option>
-              ))}
-            </select>
-            <p className="text-caption text-text-secondary">
-              For tax rates and benefit calculations
-            </p>
+            </label>
+            <SmartTooltip content="Your location affects tax rates and retirement benefits" />
           </div>
           
-          <ExplanationCard
-            title="Location Matters"
-            explanation="Your location in Canada affects tax rates, healthcare coverage, and certain retirement benefits."
-            thingsToConsider="Retirement costs can vary significantly by province. Quebec has its own pension plan (QPP) instead of CPP. Some provinces like Ontario have higher living costs but may offer better healthcare services for seniors."
-          />
+          <select
+            value={data.province}
+            onChange={(e) => updateData({ province: e.target.value })}
+            className="input-field"
+          >
+            {provinces.map((province) => (
+              <option key={province.value} value={province.value}>
+                {province.label}
+              </option>
+            ))}
+          </select>
+          
+          <div className="help-card">
+            <div className="help-title">Regional Differences</div>
+            <ul className="help-list">
+              <li className="help-item">Quebec uses QPP instead of CPP</li>
+              <li className="help-item">Provincial tax rates vary significantly</li>
+              <li className="help-item">Some provinces offer additional senior benefits</li>
+            </ul>
+          </div>
         </div>
 
         {/* Marital Status */}
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="maritalStatus" className="text-h3 text-brand-secondary">
+          <div className="flex items-center gap-2">
+            <label className="text-h3 text-text-primary font-medium">
               Marital Status
-            </Label>
-            <select
-              id="maritalStatus"
-              value={data.maritalStatus}
-              onChange={(e) => updateData({ maritalStatus: e.target.value })}
-              className="input-field"
-            >
-              {maritalStatuses.map((status) => (
-                <option key={status.value} value={status.value}>
-                  {status.label}
-                </option>
-              ))}
-            </select>
-            <p className="text-caption text-text-secondary">
-              Affects tax treatment and benefits
-            </p>
+            </label>
+            <SmartTooltip content="Affects tax treatment and potential income splitting" />
           </div>
           
-          <ExplanationCard
-            title="Relationship Impact"
-            explanation="Your relationship status affects retirement planning through potential income splitting, shared expenses, and survivor benefits."
-            thingsToConsider="Couples can often reduce taxes through income splitting strategies. Single retirees typically need 70-80% of a couple's income to maintain a similar lifestyle due to shared housing and other costs."
-          />
+          <div className="grid grid-cols-2 gap-3">
+            {maritalStatuses.map((status) => (
+              <button
+                key={status.value}
+                type="button"
+                onClick={() => updateData({ maritalStatus: status.value })}
+                className={`p-4 rounded-lg border-2 text-center transition-all duration-200 ${
+                  data.maritalStatus === status.value
+                    ? 'border-primary-brand bg-primary-brand/5 text-primary-brand'
+                    : 'border-border bg-surface hover:border-primary-brand/30'
+                }`}
+              >
+                <div className="font-medium">{status.label}</div>
+              </button>
+            ))}
+          </div>
+          
+          <div className="help-card">
+            <div className="help-title">Relationship Impact</div>
+            <ul className="help-list">
+              <li className="help-item">Couples can reduce taxes through income splitting</li>
+              <li className="help-item">Shared expenses mean lower individual retirement needs</li>
+              <li className="help-item">Survivor benefits provide additional security</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary Section */}
+      <div className="bg-gradient-to-r from-primary-brand/5 to-accent/5 rounded-xl p-6 border border-primary-brand/10">
+        <h3 className="text-h3 text-text-primary mb-4">Your Retirement Timeline</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="text-center">
+            <div className="text-h2 font-bold text-primary-brand">{data.currentAge}</div>
+            <div className="text-caption text-text-secondary">Current Age</div>
+          </div>
+          <div className="text-center">
+            <div className="text-h2 font-bold text-accent">{yearsToRetirement}</div>
+            <div className="text-caption text-text-secondary">Years to Save</div>
+          </div>
+          <div className="text-center">
+            <div className="text-h2 font-bold text-success">{data.retirementAge}</div>
+            <div className="text-caption text-text-secondary">Retirement Age</div>
+          </div>
         </div>
       </div>
     </div>
