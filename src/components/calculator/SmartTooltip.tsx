@@ -1,9 +1,11 @@
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Info } from "lucide-react";
 
 interface SmartTooltipProps {
   content: string;
+  children?: React.ReactNode;
   position?: 'auto' | 'top' | 'bottom' | 'left' | 'right';
   maxWidth?: number;
   className?: string;
@@ -11,85 +13,113 @@ interface SmartTooltipProps {
 
 const SmartTooltip = ({ 
   content, 
+  children,
   position = 'auto', 
   maxWidth = 280,
   className = "" 
 }: SmartTooltipProps) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [actualPosition, setActualPosition] = useState('top');
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ 
+    top: 0, 
+    left: 0, 
+    placement: 'top',
+    width: undefined as number | undefined
+  });
+  const triggerRef = useRef<HTMLSpanElement>(null);
+
+  const calculatePosition = () => {
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      setTooltipPosition({ 
+        top: window.innerHeight - 200,
+        left: 16,
+        placement: 'bottom-sheet',
+        width: window.innerWidth - 32 
+      });
+      return;
+    }
+    
+    // Desktop smart positioning
+    let top = rect.top - 60;
+    let left = rect.left - 140;
+    let placement = 'top';
+    
+    // Check if tooltip fits above
+    if (top < 0) {
+      top = rect.bottom + 8;
+      placement = 'bottom';
+    }
+    
+    // Check if tooltip fits to the left
+    if (left < 16) {
+      left = 16;
+    }
+    
+    // Check if tooltip fits to the right
+    if (left + maxWidth > window.innerWidth) {
+      left = window.innerWidth - maxWidth - 16;
+    }
+    
+    setTooltipPosition({ top, left, placement, width: maxWidth });
+  };
 
   useEffect(() => {
-    if (isVisible && position === 'auto' && triggerRef.current && tooltipRef.current) {
-      const triggerRect = triggerRef.current.getBoundingClientRect();
-      const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const viewportWidth = window.innerWidth;
-
-      // Smart positioning logic
-      let newPosition = 'top';
-      
-      // Check if tooltip fits above
-      if (triggerRect.top - tooltipRect.height - 8 < 0) {
-        newPosition = 'bottom';
-      }
-      
-      // Check if tooltip fits to the right
-      if (triggerRect.right + tooltipRect.width + 8 > viewportWidth) {
-        newPosition = 'left';
-      }
-      
-      // Check if tooltip fits to the left
-      if (triggerRect.left - tooltipRect.width - 8 < 0) {
-        newPosition = 'right';
-      }
-
-      setActualPosition(newPosition);
+    if (isVisible) {
+      calculatePosition();
     }
-  }, [isVisible, position]);
+  }, [isVisible, maxWidth]);
 
-  const getTooltipClasses = () => {
-    const baseClasses = `
-      tooltip-content 
-      ${actualPosition === 'auto' ? 'tooltip-top' : `tooltip-${actualPosition}`}
-      ${isVisible ? 'tooltip-enter' : ''}
-    `;
-    return baseClasses;
+  const handleMouseEnter = () => {
+    setIsVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsVisible(false);
   };
 
   return (
-    <div className="tooltip-container">
-      <button
+    <>
+      <span
         ref={triggerRef}
-        type="button"
-        onMouseEnter={() => setIsVisible(true)}
-        onMouseLeave={() => setIsVisible(false)}
-        onFocus={() => setIsVisible(true)}
-        onBlur={() => setIsVisible(false)}
         className={`tooltip-trigger ${className}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onFocus={handleMouseEnter}
+        onBlur={handleMouseLeave}
+        tabIndex={0}
+        role="button"
         aria-label="More information"
         aria-describedby={isVisible ? 'tooltip-content' : undefined}
       >
-        <Info className="w-4 h-4" />
-      </button>
+        {children || <Info className="w-4 h-4" />}
+      </span>
       
-      {isVisible && (
-        <div
-          ref={tooltipRef}
-          id="tooltip-content"
-          className={getTooltipClasses()}
-          style={{ 
-            maxWidth: `${maxWidth}px`,
-            opacity: isVisible ? 1 : 0,
-            pointerEvents: isVisible ? 'auto' : 'none'
+      {isVisible && createPortal(
+        <div 
+          className={`tooltip-portal ${tooltipPosition.placement}`}
+          style={{
+            position: 'fixed',
+            top: `${tooltipPosition.top}px`,
+            left: `${tooltipPosition.left}px`,
+            width: tooltipPosition.width ? `${tooltipPosition.width}px` : undefined,
+            zIndex: 1000,
+            pointerEvents: 'none'
           }}
-          role="tooltip"
         >
-          {content}
-        </div>
+          <div 
+            id="tooltip-content"
+            className="tooltip-content"
+            role="tooltip"
+          >
+            {content}
+          </div>
+        </div>, 
+        document.body
       )}
-    </div>
+    </>
   );
 };
 

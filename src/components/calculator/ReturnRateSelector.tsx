@@ -1,8 +1,10 @@
 
 import { useState } from "react";
 import { Lightbulb } from "lucide-react";
+import SmartTooltip from "./SmartTooltip";
 
 interface ReturnOption {
+  id: string;
   rate: string;
   value: number;
   label: string;
@@ -19,12 +21,13 @@ interface ReturnRateSelectorProps {
 
 const ReturnRateSelector = ({ value, onChange, className = "" }: ReturnRateSelectorProps) => {
   const [selectedRate, setSelectedRate] = useState(
-    value >= 0.065 ? '6-7%' : 
-    value >= 0.055 ? '5-6%' : '4-5%'
+    value >= 0.065 ? 'growth' : 
+    value >= 0.055 ? 'balanced' : 'conservative'
   );
 
   const returnOptions: ReturnOption[] = [
     {
+      id: 'conservative',
       rate: '4-5%',
       value: 0.045,
       label: 'Conservative',
@@ -33,6 +36,7 @@ const ReturnRateSelector = ({ value, onChange, className = "" }: ReturnRateSelec
       color: 'var(--success)'
     },
     {
+      id: 'balanced',
       rate: '5-6%',
       value: 0.055,
       label: 'Balanced',
@@ -41,6 +45,7 @@ const ReturnRateSelector = ({ value, onChange, className = "" }: ReturnRateSelec
       color: 'var(--brand-primary)'
     },
     {
+      id: 'growth',
       rate: '6-7%',
       value: 0.065,
       label: 'Growth',
@@ -51,53 +56,38 @@ const ReturnRateSelector = ({ value, onChange, className = "" }: ReturnRateSelec
   ];
 
   const handleOptionSelect = (option: ReturnOption) => {
-    setSelectedRate(option.rate);
+    setSelectedRate(option.id);
     onChange(option.value);
   };
 
   return (
-    <div className={`return-rate-selector ${className}`}>
-      <div className="mb-6">
-        <label className="text-h3 text-text-primary font-medium mb-2 block">
-          Expected Annual Return
-        </label>
-        <p className="text-caption text-text-secondary">
-          Choose an investment strategy based on your risk tolerance and timeline.
-        </p>
+    <div className={`return-selector ${className}`}>
+      <div className="field-label">
+        Expected Annual Return
+        <SmartTooltip content="Based on historical Canadian market performance and typical asset allocation strategies">
+        </SmartTooltip>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="return-grid">
         {returnOptions.map((option) => (
           <div
-            key={option.rate}
-            className={`
-              card-interactive cursor-pointer transition-all duration-300
-              ${selectedRate === option.rate ? 'selected' : ''}
-            `}
+            key={option.id}
+            className={`return-card ${selectedRate === option.id ? 'selected' : ''}`}
             onClick={() => handleOptionSelect(option)}
           >
-            <div className="text-center">
-              <div 
-                className="text-3xl font-bold mb-2"
+            <div className="return-rate" style={{ color: option.color }}>
+              {option.rate}
+            </div>
+            <div className="return-label">{option.label}</div>
+            <div className="return-desc">{option.description}</div>
+            <div className="flex items-center justify-center gap-2 text-small mt-2">
+              <span className="text-text-muted">Risk:</span>
+              <span 
+                className="font-semibold"
                 style={{ color: option.color }}
               >
-                {option.rate}
-              </div>
-              <div className="text-h3 text-text-primary font-semibold mb-1">
-                {option.label}
-              </div>
-              <div className="text-caption text-text-secondary mb-3">
-                {option.description}
-              </div>
-              <div className="flex items-center justify-center gap-2 text-small">
-                <span className="text-text-muted">Risk:</span>
-                <span 
-                  className="font-semibold"
-                  style={{ color: option.color }}
-                >
-                  {option.risk}
-                </span>
-              </div>
+                {option.risk}
+              </span>
             </div>
           </div>
         ))}
